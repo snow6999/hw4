@@ -9,6 +9,7 @@ bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
     snake->m_head = NULL;
 
     if (rows < MIN_BOARD_SIZE || cols < MIN_BOARD_SIZE || length == 0 ||
+        rows <= 0 || cols <= 0 || 
         length > (size_t)((rows - 2) * (cols - 2))) {
         *snake = (Snake){0};
         return false;
@@ -23,7 +24,7 @@ bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
             return false;
         }
         node->m_pos.m_row = rows / 2;
-        node->m_pos.m_col = cols / 2 - (int)i;
+        node->m_pos.m_col = cols / 2 - (int)length + 1 + (int)i;
         if (i == 0) {
             snake->m_head = node;
             node->m_next = node;

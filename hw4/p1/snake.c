@@ -1,27 +1,52 @@
 #include "snake.h"
+#include <stdlib.h>
 
 bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
+    *snake = (Snake){0};
+
+    if (rows < MIN_BOARD_SIZE || cols < MIN_BOARD_SIZE || length == 0 ||
+        length > (size_t)(rows * cols)) {
+        return false;
+    }
+
     snake->m_rows = rows;
     snake->m_cols = cols;
     snake->m_length = length;
     snake->m_direction = DIR_RIGHT;
+
+    int head_row = rows / 2;
+    int head_col = cols / 2;
+
+    SnakeNode *head = NULL;
+
     for (size_t i = 0; i < length; i++) {
         SnakeNode *node = malloc(sizeof(SnakeNode));
         if (node == NULL) {
-            snakeDestroy(snake);
+            if (head != NULL) {
+                SnakeNode *curr = head;
+                for (size_t j = 0; j < i; j++) {
+                    SnakeNode *next = curr->m_next;
+                    free(curr);
+                    curr = next;
+                }
+            }
+            *snake = (Snake){0};
             return false;
         }
-        node->m_pos.m_row = rows / 2;
-        node->m_pos.m_col = cols / 2 - i;
+
+        node->m_pos.m_row = head_row;
+        node->m_pos.m_col = head_col + (int)i;
+
         if (i == 0) {
-            snake->m_head = node;
+            head = node;
             node->m_next = node;
         } else {
-            node->m_next = snake->m_head->m_next;
-            snake->m_head->m_next = node;
+            node->m_next = head->m_next;
+            head->m_next = node;
         }
     }
 
+    snake->m_head = head;
     return true;
 }
 
@@ -29,17 +54,16 @@ Coord snakeNextPosition(const Snake *snake, Direction requested) {
     bool if_turn = true;
     Direction fin_dir = snake->m_direction;
     if (snake->m_length > 1) {
-        if (requested == DIR_UP && snake->m_direction == DIR_DOWN)
-            if_turn = false;
-        if (requested == DIR_DOWN && snake->m_direction == DIR_UP)
-            if_turn = false;
-        if (requested == DIR_RIGHT && snake->m_direction == DIR_LEFT)
-            if_turn = false;
-        if (requested == DIR_LEFT && snake->m_direction == DIR_RIGHT)
-            if_turn = false;
+        if (requested == DIR_UP && snake->m_direction == DIR_DOWN) if_turn = false;
+        if (requested == DIR_DOWN && snake->m_direction == DIR_UP) if_turn = false;
+        if (requested == DIR_RIGHT && snake->m_direction == DIR_LEFT) if_turn = false;
+        if (requested == DIR_LEFT && snake->m_direction == DIR_RIGHT) if_turn = false;
     }
-    if (if_turn == true)
+
+    if (if_turn && requested >= DIR_UP && requested < DIRECTION_COUNT) {
         fin_dir = requested;
+    }
+
     Coord next = snake->m_head->m_pos;
     if (fin_dir == DIR_UP) {
         next.m_row -= 1;
@@ -56,8 +80,9 @@ Coord snakeNextPosition(const Snake *snake, Direction requested) {
 bool snakeContains(const Snake *snake, Coord pos) {
     const SnakeNode *current = snake->m_head;
     for (size_t i = 0; i < snake->m_length; i++) {
-        if (current->m_pos.m_row == pos.m_row && current->m_pos.m_col == pos.m_col)
+        if (current->m_pos.m_row == pos.m_row && current->m_pos.m_col == pos.m_col) {
             return true;
+        }
         current = current->m_next;
     }
     return false;
@@ -65,10 +90,11 @@ bool snakeContains(const Snake *snake, Coord pos) {
 
 StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
     Coord next_pos = snakeNextPosition(snake, requested);
-    if (next_pos.m_row < 0 || next_pos.m_row >= snake->m_rows || next_pos.m_col < 0 ||
-        next_pos.m_col >= snake->m_cols) {
+    if (next_pos.m_row <= 0 || next_pos.m_row >= snake->m_rows - 1 ||
+        next_pos.m_col <= 0 || next_pos.m_col >= snake->m_cols - 1) {
         return STEP_WALL;
     }
+
     SnakeNode *current = snake->m_head;
     SnakeNode *tail = snake->m_head->m_next;
     for (size_t i = 0; i < snake->m_length; i++) {
@@ -81,7 +107,9 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
         }
         current = current->m_next;
     }
-    Coord old_head = snake->m_head->m_pos;
+
+    Coord old_head_pos = snake->m_head->m_pos;
+
     if (grow) {
         SnakeNode *new_head = malloc(sizeof(SnakeNode));
         if (new_head == NULL) {
@@ -96,13 +124,14 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
         tail->m_pos = next_pos;
         snake->m_head = tail;
     }
-    if (next_pos.m_row < old_head.m_row) {
+
+    if (next_pos.m_row < old_head_pos.m_row) {
         snake->m_direction = DIR_UP;
-    } else if (next_pos.m_row > old_head.m_row) {
+    } else if (next_pos.m_row > old_head_pos.m_row) {
         snake->m_direction = DIR_DOWN;
-    } else if (next_pos.m_col < old_head.m_col) {
+    } else if (next_pos.m_col < old_head_pos.m_col) {
         snake->m_direction = DIR_LEFT;
-    } else if (next_pos.m_col > old_head.m_col) {
+    } else if (next_pos.m_col > old_head_pos.m_col) {
         snake->m_direction = DIR_RIGHT;
     }
     return STEP_OK;
@@ -110,12 +139,11 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
 
 void snakeDestroy(Snake *snake) {
     SnakeNode *current = snake->m_head;
-    SnakeNode *next = NULL;
     for (size_t i = 0; i < snake->m_length; i++) {
         if (current == NULL) {
             break;
         }
-        next = current->m_next;
+        SnakeNode *next = current->m_next;
         free(current);
         current = next;
     }

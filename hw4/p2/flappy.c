@@ -14,8 +14,9 @@ void advancePipes(Game *game, float dt) {
 bool birdHitsObstacle(const Game *game) {
     Box bird;
     bird = gameBirdBox(game);
-    if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y)
+    if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y) {
         return true;
+    }
 
     for (int i = 0; i < PIPE_COUNT; i++) {
         float pipe_x = game->m_pipes[i].m_x;
@@ -24,7 +25,7 @@ bool birdHitsObstacle(const Game *game) {
             continue;
         }
         float gap_top = game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT / 2.0f;
-        float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;/ 2.0f;
+        float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;
 
         Box top_pipe;
         top_pipe.m_x = pipe_x;

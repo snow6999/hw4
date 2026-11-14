@@ -21,30 +21,15 @@ bool birdHitsObstacle(const Game *game) {
     for (int i = 0; i < PIPE_COUNT; i++) {
         float pipe_x = game->m_pipes[i].m_x;
 
-        if (pipe_x > VIEW_W || pipe_x + PIPE_WIDTH < 0) {
-            continue;
-        }
-        float gap_top = game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT / 2.0f;
-        float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;
+        // 小鸟的 X 区域与管道重叠
+        if (bird.m_x + BIRD_WIDTH > pipe_x && bird.m_x < pipe_x + PIPE_WIDTH) {
+            float gap_top = game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT / 2.0f;
+            float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;
 
-        Box top_pipe;
-        top_pipe.m_x = pipe_x;
-        top_pipe.m_y = 0.0f;
-        top_pipe.m_width = PIPE_WIDTH;
-        top_pipe.m_height = gap_top;
-
-        Box bottom_pipe;
-        bottom_pipe.m_x = pipe_x;
-        bottom_pipe.m_y = gap_bottom;
-        bottom_pipe.m_width = PIPE_WIDTH;
-        bottom_pipe.m_height = FLOOR_Y - gap_bottom;
-
-        if (boxesOverlap(bird, top_pipe) || boxesOverlap(bird, bottom_pipe)) {
-            return true;
-        }
-
-        if (boxesOverlap(bird, top_pipe) || boxesOverlap(bird, bottom_pipe)) {
-            return true;
+            // 如果小鸟的顶部碰到上管道，或底部碰到下管道
+            if (bird.m_y < gap_top || bird.m_y + BIRD_HEIGHT > gap_bottom) {
+                return true;
+            }
         }
     }
 

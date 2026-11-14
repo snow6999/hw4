@@ -14,19 +14,25 @@ void advancePipes(Game *game, float dt) {
 bool birdHitsObstacle(const Game *game) {
     Box bird;
     bird = gameBirdBox(game);
+    
+    // 撞天花板或地板
     if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y) {
         return true;
     }
 
     for (int i = 0; i < PIPE_COUNT; i++) {
         float pipe_x = game->m_pipes[i].m_x;
-
-        // 小鸟的 X 区域与管道重叠
-        if (bird.m_x + BIRD_WIDTH > pipe_x && bird.m_x < pipe_x + PIPE_WIDTH) {
+        
+        // 判断小鸟X轴是否和管道X轴有重叠
+        if (bird.m_x < pipe_x + PIPE_WIDTH && bird.m_x + BIRD_WIDTH > pipe_x) {
+            
+            // 计算缺口的上下边界
             float gap_top = game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT / 2.0f;
             float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;
 
-            // 如果小鸟的顶部碰到上管道，或底部碰到下管道
+            // 撞上管道：小鸟的 y 小于缺口顶部
+            // 撞下管道：小鸟的 y + 高度 大于缺口底部
+            // 注意：这里是严格的小于和大于（因为没有等于，所以碰到边缘算碰撞！）
             if (bird.m_y < gap_top || bird.m_y + BIRD_HEIGHT > gap_bottom) {
                 return true;
             }

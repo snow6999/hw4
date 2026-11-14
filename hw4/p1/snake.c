@@ -10,17 +10,20 @@ bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
 
     if (rows < MIN_BOARD_SIZE || cols < MIN_BOARD_SIZE || length == 0 ||
         length > (size_t)(rows * cols)) {
+        *snake = (Snake){0}; 
         return false;
     }
 
     for (size_t i = 0; i < length; i++) {
         SnakeNode *node = malloc(sizeof(SnakeNode));
         if (node == NULL) {
+            snake->m_length = i; 
             snakeDestroy(snake);
+            *snake = (Snake){0}; 
             return false;
         }
         node->m_pos.m_row = rows / 2;
-        node->m_pos.m_col = cols / 2 + i;
+        node->m_pos.m_col = cols / 2 - (int)length + 1 + (int)i;
         if (i == 0) {
             snake->m_head = node;
             node->m_next = node;
@@ -106,10 +109,9 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
             return STEP_NO_MEMORY;
         }
         new_head->m_pos = next_pos;
-        new_head->m_next = snake->m_head;
-        tail->m_next = new_head;
-        snake->m_head = new_head;
-        snake->m_length++;
+        new_head->m_next = tail;       
+        snake->m_head->m_next = new_head;
+        snake->m_head = new_head;      
     } else {
         tail->m_pos = next_pos;
         snake->m_head = tail;

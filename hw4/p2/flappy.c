@@ -42,6 +42,10 @@ bool birdHitsObstacle(const Game *game) {
         if (boxesOverlap(bird, top_pipe) || boxesOverlap(bird, bottom_pipe)) {
             return true;
         }
+
+        if (boxesOverlap(bird, top_pipe) || boxesOverlap(bird, bottom_pipe)) {
+            return true;
+        }
     }
 
     return false;

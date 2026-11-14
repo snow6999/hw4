@@ -12,13 +12,13 @@ void advancePipes(Game *game, float dt) {
 }
 
 bool birdHitsObstacle(const Game *game) {
-    Box bird ;
-    bird= gameBirdBox(game);
-    if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y) return true;
+    Box bird;
+    bird = gameBirdBox(game);
+    if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y)
+        return true;
 
     for (int i = 0; i < PIPE_COUNT; i++) {
         float pipe_x = game->m_pipes[i].m_x;
-        
 
         if (pipe_x > VIEW_W || pipe_x + PIPE_WIDTH < 0) {
             continue;

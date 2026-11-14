@@ -14,12 +14,10 @@ void advancePipes(Game *game, float dt) {
 bool birdHitsObstacle(const Game *game) {
     Box bird = gameBirdBox(game);
     
-    // 1. 检查是否撞墙
     if (bird.m_y < 0 || bird.m_y + bird.m_height > FLOOR_Y) {
         return true;
     }
     
-    // 2. 检查是否撞管道
     for (int i = 0; i < PIPE_COUNT; i++) {
         // 上管道
         Box top_pipe;
@@ -32,7 +30,7 @@ bool birdHitsObstacle(const Game *game) {
             return true;
         }
         
-        // 下管道
+
         Box bottom_pipe;
         bottom_pipe.m_x = game->m_pipes[i].m_x;
         bottom_pipe.m_y = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT;
@@ -45,7 +43,7 @@ bool birdHitsObstacle(const Game *game) {
     }
     
     return false;
-}V
+}
 
 int scorePassedPipes(Game *game) {
     int score = 0;

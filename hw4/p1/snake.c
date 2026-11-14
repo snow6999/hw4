@@ -8,8 +8,7 @@ bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
     snake->m_direction = DIR_RIGHT;
     snake->m_head = NULL;
 
-    if (rows < MIN_BOARD_SIZE || cols < MIN_BOARD_SIZE || length == 0 ||
-        rows <= 0 || cols <= 0 || 
+    if (rows < MIN_BOARD_SIZE || cols < MIN_BOARD_SIZE || length == 0 || rows <= 0 || cols <= 0 ||
         length > (size_t)((rows - 2) * (cols - 2))) {
         *snake = (Snake){0};
         return false;

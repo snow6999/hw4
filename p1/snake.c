@@ -5,7 +5,7 @@ bool snakeInit(Snake *snake, int rows, int cols, size_t length) {
     snake->m_cols = cols;
     snake->m_length = length;
     snake->m_direction = DIR_RIGHT;
-    for (int i = 0; i < length; i++) {
+    for (size_t i = 0; i < length; i++) {
         SnakeNode *node = malloc(sizeof(SnakeNode));
         if (node == NULL) {
             snakeDestroy(snake);
@@ -55,7 +55,7 @@ Coord snakeNextPosition(const Snake *snake, Direction requested) {
 
 bool snakeContains(const Snake *snake, Coord pos) {
     const SnakeNode *current = snake->m_head;
-    for (int i = 0; i < snake->m_length; i++) {
+    for (size_t i = 0; i < snake->m_length; i++) {
         if (current->m_pos.m_row == pos.m_row && current->m_pos.m_col == pos.m_col)
             return true;
         current = current->m_next;
@@ -71,7 +71,7 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
     }
     SnakeNode *current = snake->m_head;
     SnakeNode *tail = snake->m_head->m_next;
-    for (int i = 0; i < snake->m_length; i++) {
+    for (size_t i = 0; i < snake->m_length; i++) {
         if (current->m_pos.m_row == next_pos.m_row && current->m_pos.m_col == next_pos.m_col) {
             if (grow || current != tail) {
                 return STEP_SELF;
@@ -111,7 +111,7 @@ StepResult snakeStep(Snake *snake, Direction requested, bool grow) {
 void snakeDestroy(Snake *snake) {
     SnakeNode *current = snake->m_head;
     SnakeNode *next = NULL;
-    for (int i = 0; i < snake->m_length; i++) {
+    for (size_t i = 0; i < snake->m_length; i++) {
         if (current == NULL) {
             break;
         }

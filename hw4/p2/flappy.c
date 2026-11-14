@@ -13,35 +13,33 @@ void advancePipes(Game *game, float dt) {
 
 bool birdHitsObstacle(const Game *game) {
     Box bird = gameBirdBox(game);
-    
+
     if (bird.m_y < 0 || bird.m_y + bird.m_height > FLOOR_Y) {
         return true;
     }
-    
+
     for (int i = 0; i < PIPE_COUNT; i++) {
-        // 上管道
         Box top_pipe;
         top_pipe.m_x = game->m_pipes[i].m_x;
         top_pipe.m_y = 0.0f;
         top_pipe.m_width = PIPE_WIDTH;
         top_pipe.m_height = game->m_pipes[i].m_gap_y;
-        
+
         if (boxesOverlap(bird, top_pipe)) {
             return true;
         }
-        
 
         Box bottom_pipe;
         bottom_pipe.m_x = game->m_pipes[i].m_x;
         bottom_pipe.m_y = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT;
         bottom_pipe.m_width = PIPE_WIDTH;
         bottom_pipe.m_height = FLOOR_Y - game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT;
-        
+
         if (boxesOverlap(bird, bottom_pipe)) {
             return true;
         }
     }
-    
+
     return false;
 }
 

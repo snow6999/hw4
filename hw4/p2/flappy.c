@@ -12,26 +12,40 @@ void advancePipes(Game *game, float dt) {
 }
 
 bool birdHitsObstacle(const Game *game) {
-    Box bird;
-    bird = gameBirdBox(game);
-    if (bird.m_y < 0 || bird.m_y + BIRD_HEIGHT > FLOOR_Y) {
+    Box bird = gameBirdBox(game);
+    
+    // 1. 检查是否撞墙
+    if (bird.m_y < 0 || bird.m_y + bird.m_height > FLOOR_Y) {
         return true;
     }
-
+    
+    // 2. 检查是否撞管道
     for (int i = 0; i < PIPE_COUNT; i++) {
-        float pipe_x = game->m_pipes[i].m_x;
-        if (bird.m_x < pipe_x + PIPE_WIDTH && bird.m_x + BIRD_WIDTH > pipe_x) {
-            float gap_top = game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT / 2.0f;
-            float gap_bottom = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT / 2.0f;
-
-            if (bird.m_y < gap_top || bird.m_y + BIRD_HEIGHT > gap_bottom) {
-                return true;
-            }
+        // 上管道
+        Box top_pipe;
+        top_pipe.m_x = game->m_pipes[i].m_x;
+        top_pipe.m_y = 0.0f;
+        top_pipe.m_width = PIPE_WIDTH;
+        top_pipe.m_height = game->m_pipes[i].m_gap_y;
+        
+        if (boxesOverlap(bird, top_pipe)) {
+            return true;
+        }
+        
+        // 下管道
+        Box bottom_pipe;
+        bottom_pipe.m_x = game->m_pipes[i].m_x;
+        bottom_pipe.m_y = game->m_pipes[i].m_gap_y + PIPE_GAP_HEIGHT;
+        bottom_pipe.m_width = PIPE_WIDTH;
+        bottom_pipe.m_height = FLOOR_Y - game->m_pipes[i].m_gap_y - PIPE_GAP_HEIGHT;
+        
+        if (boxesOverlap(bird, bottom_pipe)) {
+            return true;
         }
     }
-
+    
     return false;
-}
+}V
 
 int scorePassedPipes(Game *game) {
     int score = 0;
